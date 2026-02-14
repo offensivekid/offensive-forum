@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://firestore.googleapis.com; img-src 'self' data: https:; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <title>offensive-forum - Secure Forum</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="background-grid"></div>
+    <div class="cursor-glow"></div>
+
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <div class="loading-text" data-lang-en="Loading secured forum..." data-lang-ru="Загрузка защищённого форума...">Loading secured forum...</div>
+    </div>
+
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                🔒 offensive-forum
+                <span class="security-badge">Secured</span>
+            </div>
+            <div class="header-right" id="headerButtons">
+                <button class="btn btn-lang" onclick="toggleLanguage()" id="langBtn">RU</button>
+                <button class="btn" onclick="showLoginModal()" data-lang-en="Login" data-lang-ru="Войти">Login</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="nav-section">
+                <div class="nav-title" data-lang-en="Navigation" data-lang-ru="Навигация">Navigation</div>
+                <div class="nav-item active" onclick="showSection('public')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                    <span data-lang-en="Public Threads" data-lang-ru="Публичные темы">Public Threads</span>
+                </div>
+                <div class="nav-item" id="privateNav" style="display: none;" onclick="showSection('private')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                    <span data-lang-en="Private Threads" data-lang-ru="Приватные темы">Private Threads</span>
+                </div>
+                <div class="nav-item" id="adminNav" style="display: none;" onclick="showSection('admin')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <span data-lang-en="Admin Panel" data-lang-ru="Админ-панель">Admin Panel</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title" data-lang-en="Statistics" data-lang-ru="Статистика">Statistics</div>
+                <div style="background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 8px; padding: 15px;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 5px;" data-lang-en="Total threads" data-lang-ru="Всего тем">Total threads</div>
+                    <div style="font-size: 24px; font-weight: 700;" id="totalThreads">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="section active" id="publicSection">
+                <div class="section-header">
+                    <h2 class="section-title" data-lang-en="Public Threads" data-lang-ru="Публичные темы">Public Threads</h2>
+                    <button class="btn btn-primary" id="createThreadBtn" style="display: none;" onclick="showCreateThreadModal()" data-lang-en="+ Create Thread" data-lang-ru="+ Создать тему">+ Create Thread</button>
+                </div>
+                <div id="publicThreads">
+                    <div class="empty-state" data-lang-en="Loading..." data-lang-ru="Загрузка...">Loading...</div>
+                </div>
+            </div>
+
+            <div class="section" id="privateSection">
+                <div class="section-header">
+                    <h2 class="section-title" data-lang-en="Private Threads" data-lang-ru="Приватные темы">Private Threads</h2>
+                    <button class="btn btn-primary" onclick="showCreateThreadModal(true)" data-lang-en="+ Create Private Thread" data-lang-ru="+ Создать приватную тему">+ Create Private Thread</button>
+                </div>
+                <div id="privateThreads">
+                    <div class="empty-state" data-lang-en="Loading..." data-lang-ru="Загрузка...">Loading...</div>
+                </div>
+            </div>
+
+            <div class="section" id="adminSection">
+                <div class="section-header">
+                    <h2 class="section-title" data-lang-en="Admin Panel" data-lang-ru="Админ-панель">Admin Panel</h2>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalKeys">0</div>
+                        <div class="stat-label" data-lang-en="Total Keys" data-lang-ru="Всего ключей">Total Keys</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="activeKeys">0</div>
+                        <div class="stat-label" data-lang-en="Active Keys" data-lang-ru="Активных ключей">Active Keys</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="usedKeys">0</div>
+                        <div class="stat-label" data-lang-en="Used Keys" data-lang-ru="Использованных ключей">Used Keys</div>
+                    </div>
+                </div>
+
+                <div style="background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 12px; padding: 30px; margin-bottom: 30px;">
+                    <h3 style="font-size: 18px; margin-bottom: 20px;" data-lang-en="Generate Keys" data-lang-ru="Генерация ключей">Generate Keys</h3>
+                    <div style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+                        <div class="form-group" style="flex: 1; margin: 0; min-width: 200px;">
+                            <label class="form-label" data-lang-en="Number of keys" data-lang-ru="Количество ключей">Number of keys</label>
+                            <input type="number" id="keyCount" min="1" max="50" value="1">
+                        </div>
+                        <button class="btn btn-primary" onclick="generateKeys()" data-lang-en="Generate" data-lang-ru="Сгенерировать">Generate</button>
+                    </div>
+                </div>
+
+                <div style="background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 12px; padding: 30px;">
+                    <h3 style="font-size: 18px; margin-bottom: 20px;" data-lang-en="Keys List" data-lang-ru="Список ключей">Keys List</h3>
+                    <div id="keyList">
+                        <div class="empty-state" data-lang-en="Loading..." data-lang-ru="Загрузка...">Loading...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="thread-view" id="threadView">
+        <div class="thread-detail">
+            <div class="back-btn" onclick="backToList()">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                <span data-lang-en="Back" data-lang-ru="Назад">Back</span>
+            </div>
+            <div id="threadContent"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" data-lang-en="Login to Forum" data-lang-ru="Вход на форум">Login to Forum</h3>
+                <button class="close-btn" onclick="closeModal('loginModal')">×</button>
+            </div>
+            <form onsubmit="login(event)">
+                <div class="form-group">
+                    <label class="form-label" data-lang-en="Username" data-lang-ru="Имя пользователя">Username</label>
+                    <input type="text" id="username" required minlength="3" maxlength="50" placeholder="Enter username..." autocomplete="username">
+                    <div class="form-error" id="usernameError"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" data-lang-en="Access Key (optional)" data-lang-ru="Ключ доступа (опционально)">Access Key (optional)</label>
+                    <input type="text" id="accessKey" placeholder="XXXX-XXXX-XXXX-XXXX" autocomplete="off">
+                    <div class="form-error" id="keyError"></div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;" id="loginBtn" data-lang-en="Login" data-lang-ru="Войти">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="createThreadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" data-lang-en="Create New Thread" data-lang-ru="Создать новую тему">Create New Thread</h3>
+                <button class="close-btn" onclick="closeModal('createThreadModal')">×</button>
+            </div>
+            <form onsubmit="createThread(event)">
+                <div class="form-group">
+                    <label class="form-label" data-lang-en="Title" data-lang-ru="Заголовок">Title</label>
+                    <input type="text" id="threadTitle" required minlength="5" maxlength="200" placeholder="Enter title...">
+                    <div class="form-error" id="titleError"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" data-lang-en="Description" data-lang-ru="Описание">Description</label>
+                    <textarea id="threadBody" required minlength="10" maxlength="5000" placeholder="Describe the thread..."></textarea>
+                    <div class="form-error" id="bodyError"></div>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="isPrivate">
+                    <label for="isPrivate" data-lang-en="Private thread (requires key access)" data-lang-ru="Приватная тема (требует ключ доступа)">Private thread (requires key access)</label>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;" id="createBtn" data-lang-en="Create" data-lang-ru="Создать">Create</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js" type="module"></script>
+</body>
+</html>
